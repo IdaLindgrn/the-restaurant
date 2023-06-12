@@ -1,6 +1,6 @@
 export interface IBooking {
   _id: string;
-  table: number;
+  table: number[];
   numberOfPeople: number;
   sitting: number;
   date: Date;
@@ -12,7 +12,7 @@ export interface IBooking {
 
 export const defaultBooking: IBooking = {
   _id: "",
-  table: 0,
+  table: [],
   numberOfPeople: 1,
   sitting: 1,
   date: new Date(),

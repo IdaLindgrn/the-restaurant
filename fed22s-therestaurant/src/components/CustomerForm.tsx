@@ -1,18 +1,24 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createNewBooking, getAllBookings } from "../services/bookingServices";
+import { createNewBooking } from "../services/bookingServices";
 import { ChangeEvent, useContext, useState } from "react";
 import { Wrapper } from "./styled/Wrappers";
-import {
-  BookingContext,
-  BookingDispatchContext,
-} from "../contexts/BookingContext";
+import { BookingContext, BookingDispatchContext } from "../contexts/BookingContext";
 import { ActionType } from "../reducers/BookingReducer";
-import { StyledP } from "./styled/StyledP";
+import axios from "axios";
+
 interface ICustomerFormInput {
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber: number;
+  phoneNumber: string;
+}
+
+interface IBooking extends ICustomerFormInput {
+  _id: string;
+  table: number[];
+  numberOfPeople: number;
+  sitting: number;
+  date: Date;
 }
 
 interface ICustormerFormProps {
@@ -58,38 +64,99 @@ const CustomerForm = ({ showForm }: ICustormerFormProps) => {
     setDisabled(!disabled);
   };
 
-  const onSubmit: SubmitHandler<ICustomerFormInput> = () => {
-    console.log(booking);
-
-    createNewBooking(booking);
+  const onSubmit: SubmitHandler<ICustomerFormInput> = async (data) => {
+    const { firstName, lastName, email, phoneNumber } = data;
+    const { sitting, date, numberOfPeople } = booking;
+  
+    let availableTables: number[] = [];
+    let occupiedTables: number[] = [];
+    let existingBookings: IBooking[] = [];
+  
+    try {
+      const bookingDate = new Date(date);
+  
+      const url = `http://localhost:4000/api/v1/bookings/date/${bookingDate.toISOString().slice(0, 10)}?sitting=${sitting}`;
+      const response = await axios.get<any>(url);
+  
+      existingBookings = response.data.data;
+  
+      const tableSize = 6;
+      const tablesPerSitting = 15;
+  
+      const tablesNeeded = Math.ceil(numberOfPeople / tableSize);
+  
+      occupiedTables = existingBookings.reduce((tables: number[], booking: IBooking) => {
+        if (Array.isArray(booking.table)) {
+          tables.push(...booking.table);
+        } else {
+          tables.push(booking.table);
+        }
+        return tables;
+      }, []);
+  
+      console.log(occupiedTables);
+  
+      if (occupiedTables.length + tablesNeeded > tablesPerSitting) {
+        console.log("No available tables for the selected sitting and date.");
+        return;
+      } else {
+        let remainingTablesNeeded = tablesNeeded;
+        let currentTableNumber = 1;
+  
+        while (
+          remainingTablesNeeded > 0 &&
+          currentTableNumber <= tablesPerSitting
+        ) {
+          if (occupiedTables.includes(currentTableNumber)) {
+            currentTableNumber++;
+            continue;
+          }
+  
+          availableTables.push(currentTableNumber);
+          remainingTablesNeeded--;
+          currentTableNumber++;
+        }
+  
+        if (availableTables.length === 0) {
+          console.log("No available tables for the selected sitting and date.");
+          return;
+        }
+      }
+    } catch (error) {
+      console.log("Error fetching existing bookings:", error);
+      return;
+    }
+  
+    const newBooking: IBooking = {
+      _id: "",
+      table: availableTables,
+      numberOfPeople,
+      sitting,
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      date: new Date(date.toString()),
+    };
+  
+    createNewBooking(newBooking);
   };
+  
   return (
     <div>
       {showForm ? (
         <Wrapper>
           <div>
             <p>
-              <b>
-                <StyledP>Datum:</StyledP>
-              </b>{" "}
-              <StyledP>
-                {new Date(booking.date.toString()).toLocaleDateString()}
-              </StyledP>
+              <b>Datum:</b>{" "}
+              {new Date(booking.date.toString()).toLocaleDateString()}
             </p>
             <p>
-              <b>
-                <StyledP>Gäster:</StyledP>
-              </b>{" "}
-              <StyledP>{booking.numberOfPeople.toString()}</StyledP>
+              <b>Gäster:</b> {booking.numberOfPeople.toString()}
             </p>
             <p>
-              <b>
-                <StyledP>Tid:</StyledP>
-              </b>
-              <StyledP>
-                {" "}
-                {booking.sitting == 1 ? "18-20:30" : "21-23.30"}
-              </StyledP>
+              <b>Tid:</b>{" "}
+              {booking.sitting === 1 ? "18-20:30" : "21-23.30"}
             </p>
           </div>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -137,9 +204,7 @@ const CustomerForm = ({ showForm }: ICustormerFormProps) => {
             />
             <br />
             <label htmlFor="gdprCheck">
-              <StyledP>
-                Jag godkänner hanteringen av mina personuppgifter.
-              </StyledP>
+              Jag godkänner hanteringen av mina personuppgifter.
             </label>
             <input type="checkbox" onChange={isDisabled} id="gdprCheck" />
             <input type="submit" disabled={disabled} />
