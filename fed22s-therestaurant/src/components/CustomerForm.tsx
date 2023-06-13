@@ -1,8 +1,11 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createNewBooking } from "../services/bookingServices";
-import { ChangeEvent, useContext, useState } from "react";
+import { ChangeEvent, useContext } from "react";
 import { Wrapper } from "./styled/Wrappers";
-import { BookingContext, BookingDispatchContext } from "../contexts/BookingContext";
+import {
+  BookingContext,
+  BookingDispatchContext,
+} from "../contexts/BookingContext";
 import { ActionType } from "../reducers/BookingReducer";
 import axios from "axios";
 import { IBooking } from "../models/IBooking";
@@ -31,19 +34,22 @@ const CustomerForm = ({ showForm }: ICustormerFormProps) => {
     const name = e.target.name;
     switch (name) {
       case "firstName":
-        dispatch({ type: ActionType.SET_FIRST_NAME, payload: e.target.value });
+        dispatch({ type: ActionType.FIRSTNAME, payload: e.target.value });
         break;
 
       case "lastName":
-        dispatch({ type: ActionType.SET_LAST_NAME, payload: e.target.value });
+        dispatch({ type: ActionType.LASTNAME, payload: e.target.value });
         break;
 
       case "email":
-        dispatch({ type: ActionType.SET_EMAIL, payload: e.target.value });
+        dispatch({ type: ActionType.EMAIL, payload: e.target.value });
         break;
 
       case "phoneNumber":
-        dispatch({ type: ActionType.SET_PHONE_NUMBER, payload: e.target.value });
+        dispatch({
+          type: ActionType.PHONENUMBER,
+          payload: e.target.value,
+        });
         break;
 
       default:
@@ -51,131 +57,82 @@ const CustomerForm = ({ showForm }: ICustormerFormProps) => {
     }
   };
 
-  const [disabled, setDisabled] = useState(true);
-  const [occupiedTables, setOccupiedTables] = useState<number[]>([]);
-
-  const isDisabled = () => {
-    setDisabled(!disabled);
-  };
-
   const checkIfBookingPossible = async () => {
     const { sitting, date, numberOfPeople } = booking;
   
     try {
       const bookingDate = new Date(date);
+      console.log(date);
   
-      const url = `http://localhost:4000/api/v1/bookings/date/${bookingDate.toISOString().slice(0, 10)}?sitting=${sitting}`;
+      const url = `http://localhost:4000/api/v1/bookings/date/${bookingDate
+        .toISOString()
+        .slice(0, 10)}`;
+  
       let existingBookings: IBooking[] = [];
   
       try {
         const response = await axios.get<any>(url);
         existingBookings = response.data.data;
-  
-        const newOccupiedTables: number[] = [];
-  
-        for (const booking of existingBookings) {
-          if (Array.isArray(booking.table)) {
-            newOccupiedTables.push(...booking.table);
-          } else {
-            newOccupiedTables.push(booking.table);
-          }
-        }
-  
-        setOccupiedTables(newOccupiedTables);
-        console.log(newOccupiedTables);
+        console.log(existingBookings);
       } catch (error: any) {
         if (error.response && error.response.status === 404) {
-          console.log("No existing bookings found for the selected sitting and date.");
+          console.log(
+            "No existing bookings found for the selected date."
+          );
         } else {
           throw error;
         }
       }
   
-      const tablesPerSitting = 15;
-      const tableSize = 6;
-      const tablesNeeded = Math.ceil(numberOfPeople / tableSize);
+      // Filter existing bookings by the selected sitting
+      const bookingsForSitting = existingBookings.filter(
+        (booking) => booking.sitting === sitting
+      );
   
-      if (occupiedTables.length + tablesNeeded > tablesPerSitting) {
-        console.log("No available tables for the selected sitting and date.");
-        return;
-      }
+      // Calculate the total number of people in existing bookings for the selected sitting
+      const totalPeopleInSitting = bookingsForSitting.reduce(
+        (total, booking) => total + booking.numberOfPeople,
+        0
+      );
   
-      let availableTables: number[] = [];
-      let remainingTablesNeeded = tablesNeeded;
-      let currentTableNumber = 1;
+      // Calculate the remaining available seats in the sitting
+      const remainingSeats = 90 - totalPeopleInSitting;
   
-      while (remainingTablesNeeded > 0 && currentTableNumber <= tablesPerSitting) {
-        if (
-          occupiedTables.includes(currentTableNumber) ||
-          (currentTableNumber + tablesNeeded - 1) > tablesPerSitting
-        ) {
-          currentTableNumber++;
-          continue;
-        }
-  
-        let isAvailable = true;
-        for (let i = currentTableNumber; i < currentTableNumber + tablesNeeded; i++) {
-          if (occupiedTables.includes(i)) {
-            isAvailable = false;
-            break;
-          }
-        }
-  
-        if (isAvailable) {
-          availableTables = Array.from(
-            { length: tablesNeeded },
-            (_, index) => currentTableNumber + index
-          );
-          break;
-        }
-  
-        currentTableNumber++;
-      }
-  
-      if (availableTables.length === 0) {
-        console.log("No available tables for the selected sitting and date.");
+      if (numberOfPeople > remainingSeats) {
+        console.log(
+          `The booking exceeds the available seats. Maximum capacity for the sitting is ${remainingSeats}.`
+        );
         return;
       }
   
       const newBooking: IBooking = {
-        table: availableTables,
-        numberOfPeople: booking.numberOfPeople,
-        sitting: booking.sitting,
-        date: new Date(booking.date.toString()),
+        numberOfPeople,
+        sitting,
+        date: bookingDate, // Convert bookingDate to string
         firstName: booking.firstName,
         lastName: booking.lastName,
         email: booking.email,
         phoneNumber: booking.phoneNumber,
-        _id: ""
-      };
-
-      existingBookings.push(newBooking);
+        _id: "",
+      };    
   
-      const newOccupiedTables: number[] = [];
-      for (const booking of existingBookings) {
-        if (Array.isArray(booking.table)) {
-          newOccupiedTables.push(...booking.table);
-        } else {
-          newOccupiedTables.push(booking.table);
-        }
-      }
-      setOccupiedTables(newOccupiedTables);
-      console.log(newOccupiedTables);
+      existingBookings.push(newBooking);
+      console.log(existingBookings);
   
       await createNewBooking(newBooking);
     } catch (error) {
       console.log("Error checking availability:", error);
     }
-  };  
+  };   
 
   const onSubmit: SubmitHandler<ICustomerFormInput> = async (data) => {
     const { firstName, lastName, email, phoneNumber } = data;
-
+  
     dispatch({ type: ActionType.FIRSTNAME, payload: firstName });
     dispatch({ type: ActionType.LASTNAME, payload: lastName });
     dispatch({ type: ActionType.EMAIL, payload: email });
     dispatch({ type: ActionType.PHONENUMBER, payload: phoneNumber });
-
+  
     await checkIfBookingPossible();
   };
 
@@ -193,7 +150,7 @@ const CustomerForm = ({ showForm }: ICustormerFormProps) => {
             </p>
             <p>
               <b>Tid:</b>{" "}
-              {booking.sitting === 1 ? "18-20:30" : "21-23.30"}
+              {booking.sitting.toString() === "1" ? "18-20:30" : "21-23.30"}
             </p>
           </div>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -243,8 +200,8 @@ const CustomerForm = ({ showForm }: ICustormerFormProps) => {
             <label htmlFor="gdprCheck">
               Jag godkänner hanteringen av mina personuppgifter.
             </label>
-            <input type="checkbox" onChange={isDisabled} id="gdprCheck" />
-            <input type="submit" disabled={disabled} />
+            <input type="checkbox" id="gdprCheck" />
+            <input type="submit" />
           </form>
         </Wrapper>
       ) : null}

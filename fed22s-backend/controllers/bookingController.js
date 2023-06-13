@@ -93,46 +93,7 @@ exports.createNewBooking = async (req, res) => {
       });
     }
 
-    const tableSize = 6;
-    const tablesPerSitting = 15;
-
-    const tablesNeeded = Math.ceil(numberOfPeople / tableSize);
-    const occupiedTables = await Booking.find({ sitting, date });
-
-    if (occupiedTables.length + tablesNeeded > tablesPerSitting) {
-      return res.status(400).json({
-        message: "No available tables for the selected sitting and date.",
-      });
-    }
-
-    const occupiedTableNumbers = occupiedTables.reduce(
-      (numbers, table) => numbers.concat(table.table),
-      []
-    );
-
-    const availableTables = [];
-    let remainingTablesNeeded = tablesNeeded;
-    let currentTableNumber = 1;
-
-    while (
-      remainingTablesNeeded > 0 &&
-      currentTableNumber <= tablesPerSitting
-    ) {
-      if (!occupiedTableNumbers.includes(currentTableNumber)) {
-        availableTables.push(currentTableNumber);
-        remainingTablesNeeded--;
-      }
-      currentTableNumber++;
-    }
-
-    if (availableTables.length === 0) {
-      return res.status(400).json({
-        message: "No available tables for the selected sitting and date.",
-      });
-    }
-
     const newBooking = await Booking.create({
-      table: availableTables,
       numberOfPeople,
       sitting,
       firstName,
@@ -140,7 +101,7 @@ exports.createNewBooking = async (req, res) => {
       email,
       phoneNumber,
       date: date,
-    });
+    });    
 
     return res.status(201).json(newBooking);
   } catch (error) {
@@ -175,7 +136,7 @@ exports.deleteBookingById = async (req, res) => {
 exports.updateBookingById = async (req, res) => {
   try {
     const bookingId = req.params.bookingId;
-    const { numberOfPeople, sitting, email, phoneNumber, date, table } =
+    const { numberOfPeople, sitting, email, phoneNumber, date } =
       req.body;
 
     const booking = await Booking.findById(bookingId);
@@ -184,68 +145,6 @@ exports.updateBookingById = async (req, res) => {
       return res.status(404).json({
         message: "Booking not found.",
       });
-    }
-
-    const tableSize = 6;
-    const tablesPerSitting = 15;
-
-    const tablesNeeded = Math.ceil(numberOfPeople / tableSize);
-
-    // Check if the updated booking is possible
-    if (sitting || date || table || numberOfPeople) {
-      const {
-        sitting: currentSitting,
-        date: currentDate,
-        table: currentTable,
-      } = booking;
-      const updatedSitting = sitting || currentSitting;
-      const updatedDate = date || currentDate;
-      const occupiedTables = await Booking.find({
-        sitting: updatedSitting,
-        date: updatedDate,
-      });
-
-      if (occupiedTables.length + tablesNeeded > tablesPerSitting) {
-        return res.status(400).json({
-          message: "No available tables for the selected sitting and date.",
-        });
-      }
-
-      const occupiedTableNumbers = occupiedTables.reduce(
-        (numbers, table) => numbers.concat(table.table),
-        []
-      );
-
-      const availableTables = [];
-      let remainingTablesNeeded = tablesNeeded;
-      let currentTableNumber = 1;
-
-      while (
-        remainingTablesNeeded > 0 &&
-        currentTableNumber <= tablesPerSitting
-      ) {
-        if (!occupiedTableNumbers.includes(currentTableNumber)) {
-          availableTables.push(currentTableNumber);
-          remainingTablesNeeded--;
-        }
-        currentTableNumber++;
-      }
-
-      if (table) {
-        if (!availableTables.includes(table)) {
-          return res.status(400).json({
-            message: "Invalid table number. Please choose an available table.",
-          });
-        }
-      } else {
-        // Update the table to an available table if not specified in the request
-        if (availableTables.length === 0) {
-          return res.status(400).json({
-            message: "There are no available tables on that date and sitting.",
-          });
-        }
-        booking.table = availableTables.slice(0, tablesNeeded);
-      }
     }
 
     booking.numberOfPeople = numberOfPeople || booking.numberOfPeople;

@@ -31,12 +31,12 @@ const DateForm = ({
     dispatch({ type: ActionType.NUMBEROFPEOPLE, payload: e.target.value });
   };
 
-  const handleDateChange = (date: ValuePiece | [ValuePiece, ValuePiece]) => {
+  const handleDateChange = (date: ValuePiece | [ValuePiece, ValuePiece] | null) => {
     setDate(date);
-    const chosenDate = date?.toString() as string;
+    const chosenDate = date instanceof Date ? date : date?.[0] || null;
     dispatch({ type: ActionType.DATE, payload: chosenDate });
     setShowTime(true);
-  };
+  };  
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

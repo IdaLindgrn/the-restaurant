@@ -1,17 +1,13 @@
 import { IBooking } from "../models/IBooking";
 
 export enum ActionType {
-  SET_NUMBER_OF_PEOPLE,
-  SET_SITTING,
-  SET_DATE,
-  SET_FIRST_NAME,
-  SET_LAST_NAME,
-  SET_EMAIL,
-  SET_PHONE_NUMBER,
   FIRSTNAME,
   LASTNAME,
   EMAIL,
-  PHONENUMBER
+  PHONENUMBER,
+  SITTING,
+  NUMBEROFPEOPLE,
+  DATE,
 }
 
 export interface IAction {
@@ -21,31 +17,31 @@ export interface IAction {
 
 const BookingReducer = (booking: IBooking, action: IAction): IBooking => {
   switch (action.type) {
-    case ActionType.SET_NUMBER_OF_PEOPLE: {
+    case ActionType.NUMBEROFPEOPLE: {
       return { ...booking, numberOfPeople: action.payload };
     }
 
-    case ActionType.SET_SITTING: {
+    case ActionType.SITTING: {
       return { ...booking, sitting: action.payload };
     }
 
-    case ActionType.SET_DATE: {
+    case ActionType.DATE: {
       return { ...booking, date: action.payload };
     }
 
-    case ActionType.SET_FIRST_NAME: {
+    case ActionType.FIRSTNAME: {
       return { ...booking, firstName: action.payload };
     }
 
-    case ActionType.SET_LAST_NAME: {
+    case ActionType.LASTNAME: {
       return { ...booking, lastName: action.payload };
     }
 
-    case ActionType.SET_EMAIL: {
+    case ActionType.EMAIL: {
       return { ...booking, email: action.payload };
     }
 
-    case ActionType.SET_PHONE_NUMBER: {
+    case ActionType.PHONENUMBER: {
       return { ...booking, phoneNumber: action.payload };
     }
 

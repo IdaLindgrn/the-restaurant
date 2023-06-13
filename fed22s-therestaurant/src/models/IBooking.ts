@@ -1,18 +1,16 @@
 export interface IBooking {
-  _id: string;
-  table: number[];
   numberOfPeople: number;
   sitting: number;
-  date: Date;
+  date: Date // Update the type to Date | null
   firstName: string;
   lastName: string;
   email: string;
   phoneNumber: string;
-}
+  _id: string;
+};
 
 export const defaultBooking: IBooking = {
   _id: "",
-  table: [],
   numberOfPeople: 1,
   sitting: 1,
   date: new Date(),
