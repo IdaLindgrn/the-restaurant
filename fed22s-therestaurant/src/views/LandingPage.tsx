@@ -1,35 +1,29 @@
 import { useEffect } from "react";
-import {
-  createNewBooking,
-  deleteBookingById,
-  getAllBookings,
-  getBookingById,
-  updateBookingById,
-} from "../services/bookingServices";
-
-import { Link } from "react-router-dom";
-import { Button, LandingPageButton } from "../components/styled/Buttons";
+import { getAllBookings } from "../services/bookingServices";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../components/styled/Buttons";
 import { StyledH1 } from "../components/styled/StyledH1";
 import { GeneralWrapper } from "../components/styled/Wrappers";
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     getAllBookings();
-    //getBookingById();
-    //createNewBooking();
-    //deleteBookingById();
-    //updateBookingById();
   }, []);
 
   return (
     <>
       <GeneralWrapper flexdirection="column">
         <StyledH1 fontSize="8rem">WAIO</StyledH1>
-        <Link to="/book">
-          <Button bgcolor="red" color="white" fontSize="1.3rem">
-            Boka Bord
-          </Button>
-        </Link>
+        <Button
+          bgcolor="red"
+          color="white"
+          fontSize="1.3rem"
+          onClick={() => navigate("/book")}
+        >
+          Boka Bord
+        </Button>
       </GeneralWrapper>
     </>
   );

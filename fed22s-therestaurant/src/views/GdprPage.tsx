@@ -1,4 +1,3 @@
-import { Footer } from "../components/Footer";
 import { Wrapper, GeneralWrapper } from "../components/styled/Wrappers";
 import { StyledP } from "../components/styled/StyledP";
 import { useNavigate } from "react-router-dom";
@@ -34,7 +33,6 @@ const ContactPage = () => {
           </LandingPageButton>
         </Wrapper>
       </GeneralWrapper>
-      <Footer></Footer>
     </>
   );
 };

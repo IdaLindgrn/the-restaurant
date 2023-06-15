@@ -1,6 +1,4 @@
-import { ChangeEvent, FormEvent, useContext, useState } from "react";
-import { IBooking, defaultBooking } from "../models/IBooking";
-import setBookingLs from "../utils/setLS";
+import { ChangeEvent, FormEvent, useContext } from "react";
 import { BookingDispatchContext } from "../contexts/BookingContext";
 import { ActionType } from "../reducers/BookingReducer";
 import { StyledP } from "./styled/StyledP";
@@ -56,14 +54,9 @@ const SittingForm = ({
               onChange={handleChange}
             />
           </div>
-          <Button
-                  bgcolor="red"
-                  color="white"
-                  fontSize="0.9rem"
-                  type="submit"
-                >
-                  Välj
-                </Button>
+          <Button bgcolor="red" color="white" fontSize="0.9rem" type="submit">
+            Välj
+          </Button>
         </form>
       ) : null}
     </div>

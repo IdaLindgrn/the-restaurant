@@ -1,5 +1,4 @@
-import { Link } from "react-router-dom";
-import { Footer } from "../components/Footer";
+import { useNavigate } from "react-router-dom";
 import {
   InfoWrapper,
   ContactWrapper,
@@ -11,9 +10,11 @@ import { StyledP } from "../components/styled/StyledP";
 import { Button } from "../components/styled/Buttons";
 
 const ContactPage = () => {
+  const navigate = useNavigate();
+
   return (
     <>
-      <GeneralWrapper>
+      <GeneralWrapper flexdirection="row">
         <Wrapper>
           <h3>Kontakta oss</h3>
           <StyledP>
@@ -21,13 +22,18 @@ const ContactPage = () => {
             telefon. Vill du boka eller avboka ett bord, vänligen använd vår
             bokningstjänst.
           </StyledP>
-          <Link to="/book">
-            <Button>Boka Bord</Button>
-          </Link>
+          <Button
+            onClick={() => navigate("/book")}
+            bgcolor="red"
+            color="white"
+            fontSize="1rem"
+          >
+            Boka Bord
+          </Button>
           <Hr></Hr>
           <ContactWrapper>
             <InfoWrapper>
-              <h5>AWO</h5>
+              <h5>WAIO</h5>
               <p>Vägen 12</p>
               <p>123 45 Sthlm</p>
               <p>Tel. 123-456 78 90</p>
@@ -40,7 +46,6 @@ const ContactPage = () => {
           </ContactWrapper>
         </Wrapper>
       </GeneralWrapper>
-      <Footer></Footer>
     </>
   );
 };

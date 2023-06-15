@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { getAllBookings, deleteBookingById } from "../services/bookingServices";
 import { IBooking } from "../models/IBooking";
-import { TableWrapper, Wrapper } from "./styled/Wrappers";
+import { TableWrapper } from "./styled/Wrappers";
 import { Button } from "./styled/Buttons";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Table, TableData, TableHeader, TableRow } from "./styled/Table";
 
 interface FilterBookingsProps {
@@ -33,7 +33,6 @@ export const AdminTable = ({ bookings, set }: FilterBookingsProps) => {
   async function RemoveBooking(id: string) {
     console.log(id);
     const response = await deleteBookingById(id);
-
     set(bookings.filter((booking) => booking._id !== id));
   }
 
@@ -56,11 +55,15 @@ export const AdminTable = ({ bookings, set }: FilterBookingsProps) => {
         >
           Visa dagens bokningar
         </Button>
-        <Link to={"/book"}>
-          <Button bgcolor="black" color="white" fontSize="1rem">
-            Boka bord
-          </Button>
-        </Link>
+
+        <Button
+          bgcolor="black"
+          color="white"
+          fontSize="1rem"
+          onClick={() => navigate("/book")}
+        >
+          Boka bord
+        </Button>
       </div>
       <TableWrapper>
         <Table>

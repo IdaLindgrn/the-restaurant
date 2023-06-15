@@ -1,8 +1,6 @@
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { IBooking, defaultBooking } from "../models/IBooking";
-import setBookingLs from "../utils/setLS";
 import SittingForm from "./SittingForm";
 import { ValuePiece } from "../utils/valuePiece";
 import { Wrapper } from "./styled/Wrappers";

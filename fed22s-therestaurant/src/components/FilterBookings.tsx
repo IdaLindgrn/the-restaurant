@@ -1,6 +1,5 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { IBooking } from "../models/IBooking";
-import { Button } from "./styled/Buttons";
 import bookingFromLS from "../utils/getLS";
 
 interface FilterBookingsProps {

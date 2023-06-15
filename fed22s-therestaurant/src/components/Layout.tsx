@@ -1,6 +1,5 @@
 import { Outlet } from "react-router";
 import { Header } from "./Header";
-import { Footer } from "./Footer";
 import GlobalStyle from "./styled/Global";
 import GlobalFonts from "../fonts/fonts";
 import { GeneralWrapper } from "./styled/Wrappers";
@@ -17,7 +16,6 @@ const Layout = () => {
           <GeneralWrapper flexdirection="column">
             <Outlet></Outlet>
           </GeneralWrapper>
-          <Footer></Footer>
         </BackgroundImage>
       </main>
     </>

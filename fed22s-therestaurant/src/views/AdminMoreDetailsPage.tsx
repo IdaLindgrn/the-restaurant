@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import AdminMoreDetails from "../components/AdminMoreDetails";
 import { IBooking } from "../models/IBooking";
 import { getBookingById } from "../services/bookingServices";
-import setBookingsLs from "../utils/setLS";
 import { useParams } from "react-router";
 
 const AdminMoreDetailsPage = () => {

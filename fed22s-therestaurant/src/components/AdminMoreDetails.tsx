@@ -3,7 +3,6 @@ import {
   deleteBookingById,
   updateBookingById,
 } from "../services/bookingServices";
-import { useState } from "react";
 import { Button } from "../components/styled/Buttons";
 import { IBooking } from "../models/IBooking";
 import { Link } from "react-router-dom";
@@ -12,9 +11,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { ChangeEvent, useContext } from "react";
 import { BookingDispatchContext } from "../contexts/BookingContext";
 import { ActionType } from "../reducers/BookingReducer";
-import DatePicker from "react-date-picker";
 import "react-date-picker/dist/DatePicker.css";
-import { ValuePiece } from "../utils/valuePiece";
 
 interface FilterBookingsProps {
   booking: IBooking;
