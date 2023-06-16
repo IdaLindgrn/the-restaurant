@@ -2,10 +2,31 @@
   "name": "fed22s-backend",
   "version": "1.0.0",
   "description": "Contains the api for the restaurant assignment",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js",
+    "seedDb": "node seedDb.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@ngneat/falso": "^6.4.0",
+    "@types/moment": "^2.13.0",
+    "axios": "^1.4.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-async-errors": "^3.1.1",
+    "falso": "^0.0.0",
+    "mailtrap": "^3.1.1",
+    "mongoose": "^7.2.2",
+    "nodemailer": "^6.9.3",
+    "react-router": "^6.11.2",
+    "react-router-dom": "^6.11.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
 }
